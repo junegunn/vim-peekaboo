@@ -76,12 +76,15 @@ function! s:peekaboo(count, visualmode)
   try
     let reg  = nr2char(getchar())
     let rest = ''
-    if has_key(s:regs, reg)
+    let known = has_key(s:regs, reg)
+    let upper = !known && has_key(s:regs, tolower(reg))
+    if known || upper
       wincmd p
-      let line = s:regs[reg]
+      let line = s:regs[tolower(reg)]
       execute 'normal!' line.'G'
       execute 'syntax region peekabooSelected start=/\%'.line.'l\%5c/ end=/$/'
       setlocal cursorline
+      call setline(line('.'), substitute(getline('.'), ' .', ' '.reg, ''))
       wincmd p
       if a:visualmode
         normal! gv
