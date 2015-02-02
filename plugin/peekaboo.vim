@@ -67,7 +67,7 @@ endfunction
 function! s:peekaboo(count, visualmode)
   call s:init()
 
-  wincmd w
+  wincmd p
   if a:visualmode
     normal! gv
   endif
@@ -77,12 +77,12 @@ function! s:peekaboo(count, visualmode)
     let reg  = nr2char(getchar())
     let rest = ''
     if has_key(s:regs, reg)
-      wincmd w
+      wincmd p
       let line = s:regs[reg]
       execute 'normal!' line.'G'
       execute 'syntax region peekabooSelected start=/\%'.line.'l\%5c/ end=/$/'
       setlocal cursorline
-      wincmd w
+      wincmd p
       if a:visualmode
         normal! gv
       endif
