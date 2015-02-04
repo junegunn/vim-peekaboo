@@ -21,8 +21,8 @@
 " THE SOFTWARE.
 
 syntax clear
-syntax match peekabooTitle /^[A-Za-z]*/ contained
-syntax match peekabooTitleColon /^[A-Za-z]*:/ contains=peekabooTitle
+syntax match peekabooTitle /^[A-Za-z-]*/ contained
+syntax match peekabooTitleColon /^[A-Za-z-]*:/ contains=peekabooTitle
 syntax match peekabooReg /^ ./ contained
 syntax match peekabooRegColon /^ .:/ contains=peekabooReg
 highlight default link peekabooTitle Title

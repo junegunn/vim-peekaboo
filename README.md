@@ -1,7 +1,7 @@
 vim-peekaboo
 ============
 
-Peekaboo extends `"` so that you can see the contents of the registers.
+Peekaboo extends `"` and `@` so you can see the contents of the registers.
 
 Installation
 ------------
