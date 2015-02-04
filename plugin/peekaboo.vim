@@ -28,12 +28,15 @@ let s:peekaboo = 0
 function! s:append_group(title, regs)
   call append(line('$'), a:title.':')
   for r in a:regs
-    let val = eval('@'.r)
-    if empty(val)
-      continue
-    endif
-    let s:regs[printf('%s', r)] = line('$')
-    call append(line('$'), printf(' %s: %s', r, val))
+    try
+      let val = eval('@'.r)
+      if empty(val)
+        continue
+      endif
+      let s:regs[printf('%s', r)] = line('$')
+      call append(line('$'), printf(' %s: %s', r, val))
+    catch
+    endtry
   endfor
   call append(line('$'), '')
 endfunction
