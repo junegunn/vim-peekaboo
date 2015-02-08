@@ -1,6 +1,8 @@
 vim-peekaboo
 ============
 
+![](https://cloud.githubusercontent.com/assets/700826/6095261/bb00340c-af96-11e4-9df5-9cd869673a11.gif)
+
 Peekaboo extends `"` and `@` so you can see the contents of the registers.
 
 Installation
