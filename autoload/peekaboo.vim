@@ -109,6 +109,10 @@ function! peekaboo#peek(count, mode, visualmode)
       if reg == '"' | let seq .= "\<Plug>(peekaboo-quote2)" . rest
       else          | let seq .= "\<Plug>(peekaboo-quote1)" . reg . rest
       endif
+    elseif a:mode ==# 'ctrl-r'
+      if reg == "\<c-r>" | let seq .= reg
+      else               | let seq .= "\<Plug>(peekaboo-ctrl-r)" . reg
+      endif
     else
       if reg == '@' | let seq .= "\<Plug>(peekaboo-replay2)" . rest
       else          | let seq .= "\<Plug>(peekaboo-replay1)" . reg . rest
@@ -129,6 +133,7 @@ xnoremap <Plug>(peekaboo-quote1) "
 xnoremap <Plug>(peekaboo-quote2) ""
 nnoremap <Plug>(peekaboo-replay1) @
 nnoremap <Plug>(peekaboo-replay2) @@
+inoremap <Plug>(peekaboo-ctrl-r) <c-r>
 
 let &cpo = s:cpo_save
 unlet s:cpo_save
