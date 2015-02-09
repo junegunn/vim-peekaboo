@@ -57,7 +57,6 @@ function! s:init(mode)
   let s:peekaboo = bufnr('')
   setlocal nonumber buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap
          \ modifiable statusline=>\ Registers nocursorline
-  silent file peekaboo
   setfiletype peekaboo
   augroup peekaboo
     autocmd!
