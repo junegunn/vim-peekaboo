@@ -56,7 +56,7 @@ function! s:init(mode)
   execute get(g:, 'peekaboo_window', 'vertical botright 30new')
   let s:peekaboo = bufnr('')
   setlocal nonumber buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap
-         \ modifiable statusline=>\ Registers nocursorline
+         \ modifiable statusline=>\ Registers nocursorline nofoldenable
   setfiletype peekaboo
   augroup peekaboo
     autocmd!
