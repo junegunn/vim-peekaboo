@@ -111,6 +111,9 @@ endfunction
 function! peekaboo#peek(count, mode, visualmode)
   let c = s:init(a:mode)
   if !empty(c)
+    if a:visualmode
+      normal! gv
+    endif
     return s:feed(a:count, a:mode, c, '')
   endif
   call s:back(a:visualmode)
