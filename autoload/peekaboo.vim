@@ -71,17 +71,40 @@ function! s:init(mode)
   normal! "_dd
 endfunction
 
-function! peekaboo#peek(count, mode, visualmode)
-  call s:init(a:mode)
-
+function! s:back(visualmode)
   wincmd p
   if a:visualmode
     normal! gv
   endif
   redraw
+endfunction
 
+function! peekaboo#peek(count, mode, visualmode)
+  call s:init(a:mode)
+  call s:back(a:visualmode)
+
+  let tl = &tabline
+  let zoom = 0
   try
-    let reg  = nr2char(getchar())
+    while 1
+      let reg = nr2char(getchar())
+      if zoom
+        tab close
+        let &tabline = tl
+        call s:back(a:visualmode)
+      endif
+      if reg != ' '
+        break
+      endif
+      if !zoom
+        wincmd p
+        tab split
+        set tabline=%#TabLineSel#>\ Registers
+      endif
+      let zoom = !zoom
+      redraw
+    endwhile
+
     let rest = ''
     if a:mode ==# 'quote' && has_key(s:regs, tolower(reg))
       wincmd p
@@ -90,11 +113,7 @@ function! peekaboo#peek(count, mode, visualmode)
       execute 'syntax region peekabooSelected start=/\%'.line.'l\%5c/ end=/$/'
       setlocal cursorline
       call setline(line('.'), substitute(getline('.'), ' .', ' '.reg, ''))
-      wincmd p
-      if a:visualmode
-        normal! gv
-      endif
-      redraw
+      call s:back(a:visualmode)
       let rest = nr2char(getchar())
     endif
 
@@ -116,6 +135,7 @@ function! peekaboo#peek(count, mode, visualmode)
   catch /^Vim:Interrupt$/
     return
   finally
+    let &tabline = tl
     call s:close()
     redraw
   endtry

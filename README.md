@@ -15,6 +15,15 @@ Using [vim-plug](https://github.com/junegunn/vim-plug):
 Plug 'junegunn/vim-peekaboo'
 ```
 
+Usage
+-----
+
+Peekaboo will show you the contents of the registers on the sidebar when you
+hit `"` or `@` in normal mode or `<CTRL-R>` in insert mode. The sidebar is
+automatically closed on subsequent key strokes.
+
+You can toggle fullscreen mode by pressing spacebar.
+
 Customization
 -------------
 
