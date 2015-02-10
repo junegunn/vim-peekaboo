@@ -52,6 +52,16 @@ endfunction
 
 function! s:init(mode)
   call s:close()
+  let delay = get(g:, 'peekaboo_delay', 0)
+  while delay > 0
+    let delay -= 50
+    let c = getchar(0)
+    if c
+      return nr2char(c)
+    endif
+    sleep 50m
+  endwhile
+
   let [s:cur, s:alt] = [@%, @#]
   execute get(g:, 'peekaboo_window', 'vertical botright 30new')
   let s:peekaboo = bufnr('')
@@ -69,6 +79,7 @@ function! s:init(mode)
   call s:append_group('Numbered', range(0, 9))
   call s:append_group('Named', map(range(97, 97 + 25), 'nr2char(v:val)'))
   normal! "_dd
+  return ''
 endfunction
 
 function! s:back(visualmode)
@@ -79,8 +90,29 @@ function! s:back(visualmode)
   redraw
 endfunction
 
+function! s:feed(count, mode, reg, rest)
+  let seq = a:count > 1 ? a:count : ''
+  if a:mode ==# 'quote'
+    if a:reg == '"' | let seq .= "\<Plug>(pkbq2)" . a:rest
+    else            | let seq .= "\<Plug>(pkbq1)" . a:reg . a:rest
+    endif
+  elseif a:mode ==# 'ctrl-r'
+    if a:reg == "\<c-r>" | let seq .= a:reg
+    else                 | let seq .= "\<Plug>(pkbcr)" . a:reg
+    endif
+  else
+    if a:reg == '@' | let seq .= "\<Plug>(pkbr2)" . a:rest
+    else            | let seq .= "\<Plug>(pkbr1)" . a:reg . a:rest
+    endif
+  endif
+  call feedkeys(seq)
+endfunction
+
 function! peekaboo#peek(count, mode, visualmode)
-  call s:init(a:mode)
+  let c = s:init(a:mode)
+  if !empty(c)
+    return s:feed(a:count, a:mode, c, '')
+  endif
   call s:back(a:visualmode)
 
   let tl = &tabline
@@ -117,21 +149,7 @@ function! peekaboo#peek(count, mode, visualmode)
       let rest = nr2char(getchar())
     endif
 
-    let seq = a:count > 1 ? a:count : ''
-    if a:mode ==# 'quote'
-      if reg == '"' | let seq .= "\<Plug>(peekaboo-quote2)" . rest
-      else          | let seq .= "\<Plug>(peekaboo-quote1)" . reg . rest
-      endif
-    elseif a:mode ==# 'ctrl-r'
-      if reg == "\<c-r>" | let seq .= reg
-      else               | let seq .= "\<Plug>(peekaboo-ctrl-r)" . reg
-      endif
-    else
-      if reg == '@' | let seq .= "\<Plug>(peekaboo-replay2)" . rest
-      else          | let seq .= "\<Plug>(peekaboo-replay1)" . reg . rest
-      endif
-    endif
-    call feedkeys(seq)
+    call s:feed(a:count, a:mode, reg, rest)
   catch /^Vim:Interrupt$/
     return
   finally
@@ -141,13 +159,13 @@ function! peekaboo#peek(count, mode, visualmode)
   endtry
 endfunction
 
-nnoremap <Plug>(peekaboo-quote1) "
-nnoremap <Plug>(peekaboo-quote2) ""
-xnoremap <Plug>(peekaboo-quote1) "
-xnoremap <Plug>(peekaboo-quote2) ""
-nnoremap <Plug>(peekaboo-replay1) @
-nnoremap <Plug>(peekaboo-replay2) @@
-inoremap <Plug>(peekaboo-ctrl-r) <c-r>
+nnoremap <Plug>(pkbq1) "
+nnoremap <Plug>(pkbq2) ""
+xnoremap <Plug>(pkbq1) "
+xnoremap <Plug>(pkbq2) ""
+nnoremap <Plug>(pkbr1) @
+nnoremap <Plug>(pkbr2) @@
+inoremap <Plug>(pkbcr) <c-r>
 
 let &cpo = s:cpo_save
 unlet s:cpo_save
