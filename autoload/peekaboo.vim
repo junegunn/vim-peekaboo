@@ -81,8 +81,23 @@ function! peekaboo#peek(count, mode, visualmode)
   redraw
 
   try
-    let reg  = nr2char(getchar())
+    let reg  = getchar()
     let rest = ''
+
+    while reg == "\<Down>" || reg == "\<Up>"
+        wincmd p
+        if reg == "\<Down>"
+            execute 'normal! G'
+        else
+            execute 'normal! gg'
+        endif
+        wincmd p
+        redraw
+        let reg = getchar()
+    endwhile
+
+    let reg = nr2char(reg)
+
     if a:mode ==# 'quote' && has_key(s:regs, tolower(reg))
       wincmd p
       let line = s:regs[tolower(reg)]
