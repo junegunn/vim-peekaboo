@@ -108,6 +108,14 @@ function! s:feed(count, mode, reg, rest)
   call feedkeys(seq)
 endfunction
 
+let s:scroll = {
+\ "\<up>":     "\<c-y>", "\<down>":     "\<c-e>",
+\ "\<c-y>":    "\<c-y>", "\<c-e>":      "\<c-e>",
+\ "\<c-u>":    "\<c-u>", "\<c-d>":      "\<c-d>",
+\ "\<c-b>":    "\<c-b>", "\<c-f>":      "\<c-f>",
+\ "\<pageup>": "\<c-b>", "\<pagedown>": "\<c-f>"
+\ }
+
 function! peekaboo#peek(count, mode, visualmode)
   let c = s:init(a:mode)
   if !empty(c)
@@ -122,7 +130,16 @@ function! peekaboo#peek(count, mode, visualmode)
   let zoom = 0
   try
     while 1
-      let reg = nr2char(getchar())
+      let ch  = getchar()
+      let reg = nr2char(ch)
+      let key = get(s:scroll, ch, get(s:scroll, reg, ''))
+      if !empty(key)
+        wincmd p
+        execute 'normal!' key
+        call s:back(a:visualmode)
+        continue
+      endif
+
       if zoom
         tab close
         let [&showtabline, &laststatus] = [stl, lst]
