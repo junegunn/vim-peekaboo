@@ -118,14 +118,14 @@ function! peekaboo#peek(count, mode, visualmode)
   endif
   call s:back(a:visualmode)
 
-  let tl = &tabline
+  let [stl, lst] = [&showtabline, &laststatus]
   let zoom = 0
   try
     while 1
       let reg = nr2char(getchar())
       if zoom
         tab close
-        let &tabline = tl
+        let [&showtabline, &laststatus] = [stl, lst]
         call s:back(a:visualmode)
       endif
       if reg != ' '
@@ -134,7 +134,7 @@ function! peekaboo#peek(count, mode, visualmode)
       if !zoom
         wincmd p
         tab split
-        set tabline=%#TabLineSel#>\ Registers
+        set showtabline=0 laststatus=0
       endif
       let zoom = !zoom
       redraw
@@ -156,7 +156,7 @@ function! peekaboo#peek(count, mode, visualmode)
   catch /^Vim:Interrupt$/
     return
   finally
-    let &tabline = tl
+    let [&showtabline, &laststatus] = [stl, lst]
     call s:close()
     redraw
   endtry
