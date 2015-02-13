@@ -83,7 +83,7 @@ function! s:init(mode)
 endfunction
 
 function! s:back(visualmode)
-  wincmd p
+  execute s:win.current.'wincmd w'
   if a:visualmode
     normal! gv
   endif
@@ -117,7 +117,9 @@ let s:scroll = {
 \ }
 
 function! peekaboo#peek(count, mode, visualmode)
+  let s:win = { 'current': winnr() }
   let c = s:init(a:mode)
+  let s:win.peekaboo = winnr()
   if !empty(c)
     if a:visualmode
       normal! gv
@@ -134,7 +136,7 @@ function! peekaboo#peek(count, mode, visualmode)
       let reg = nr2char(ch)
       let key = get(s:scroll, ch, get(s:scroll, reg, ''))
       if !empty(key)
-        wincmd p
+        execute s:win.peekaboo.'wincmd w'
         execute 'normal!' key
         call s:back(a:visualmode)
         continue
@@ -149,7 +151,7 @@ function! peekaboo#peek(count, mode, visualmode)
         break
       endif
       if !zoom
-        wincmd p
+        execute s:win.peekaboo.'wincmd w'
         tab split
         set showtabline=0 laststatus=0
       endif
@@ -159,7 +161,7 @@ function! peekaboo#peek(count, mode, visualmode)
 
     let rest = ''
     if a:mode ==# 'quote' && has_key(s:regs, tolower(reg))
-      wincmd p
+      execute s:win.peekaboo.'wincmd w'
       let line = s:regs[tolower(reg)]
       execute 'normal!' line.'G'
       execute 'syntax region peekabooSelected start=/\%'.line.'l\%5c/ end=/$/'
