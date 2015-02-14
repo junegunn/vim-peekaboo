@@ -35,6 +35,17 @@ let g:peekaboo_window = 'vertical botright 30new'
 let g:peekaboo_delay = 750
 ```
 
+FAQ
+---
+
+### "Peekaboo conflicts with my maps and abbrevs"
+
+Use `nore`-versions (e.g. `nnoremap`, `inoreabbrev`) so that they are are not
+expanded. It is strongly advised that [you always stick to `nore`-versions][m]
+unless you know what you're doing.
+
+[m]: http://learnvimscriptthehardway.stevelosh.com/chapters/05.html
+
 License
 -------
 
