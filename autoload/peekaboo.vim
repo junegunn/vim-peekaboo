@@ -101,9 +101,11 @@ function! s:feed(count, mode, reg, rest)
     else                 | let seq .= "\<Plug>(pkbcr)" . a:reg
     endif
   else
+    call peekaboo#off()
     if a:reg == '@' | let seq .= "\<Plug>(pkbr2)" . a:rest
     else            | let seq .= "\<Plug>(pkbr1)" . a:reg . a:rest
     endif
+    let seq .= "\<Plug>(pkbon)"
   endif
   call feedkeys(seq)
 endfunction
@@ -188,6 +190,10 @@ xnoremap <Plug>(pkbq2) ""
 nnoremap <Plug>(pkbr1) @
 nnoremap <Plug>(pkbr2) @@
 inoremap <Plug>(pkbcr) <c-r>
+nnoremap <silent> <Plug>(pkbon) :call peekaboo#on()<cr>
+inoremap <silent> <Plug>(pkbon) <c-o>:call peekaboo#on()<cr>
+vnoremap <silent> <Plug>(pkbon) :<c-u>call peekaboo#on()<cr>gv
+cnoremap <silent> <Plug>(pkbon) <c-r>=peekaboo#on()<cr>
 
 let &cpo = s:cpo_save
 unlet s:cpo_save

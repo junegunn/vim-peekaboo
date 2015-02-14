@@ -20,8 +20,20 @@
 " OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 " THE SOFTWARE.
 
-nnoremap <silent> " :<c-u>call peekaboo#peek(v:count1, 'quote',  0)<cr>
-xnoremap <silent> " :<c-u>call peekaboo#peek(v:count1, 'quote',  1)<cr>
-nnoremap <silent> @ :<c-u>call peekaboo#peek(v:count1, 'replay', 0)<cr>
-inoremap <silent> <c-r> <c-o>:call peekaboo#peek(1, 'ctrl-r',  0)<cr>
+function! peekaboo#on()
+  nnoremap <silent> " :<c-u>call peekaboo#peek(v:count1, 'quote',  0)<cr>
+  xnoremap <silent> " :<c-u>call peekaboo#peek(v:count1, 'quote',  1)<cr>
+  nnoremap <silent> @ :<c-u>call peekaboo#peek(v:count1, 'replay', 0)<cr>
+  inoremap <silent> <c-r> <c-o>:call peekaboo#peek(1, 'ctrl-r',  0)<cr>
+  return ''
+endfunction
+
+function! peekaboo#off()
+  nunmap "
+  xunmap "
+  nunmap @
+  iunmap <c-r>
+endfunction
+
+call peekaboo#on()
 
