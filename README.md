@@ -40,11 +40,22 @@ FAQ
 
 ### "Peekaboo conflicts with my maps and abbrevs"
 
-Use `nore`-versions (e.g. `nnoremap`, `inoreabbrev`) so that they are are not
-expanded. It is strongly advised that [you always stick to `nore`-versions][m]
-unless you know what you're doing.
+Use non-recursive maps and abbreviations (e.g. `nnoremap`, `inoreabbrev`) so
+that they are not expanded. It is strongly advised that [you always stick to
+`nore`-versions][m] unless you know exactly what you're doing.
 
 [m]: http://learnvimscriptthehardway.stevelosh.com/chapters/05.html
+
+Known issues
+------------
+
+### Compatability with macros
+
+Peekaboo internally uses `feedkeys()` function which can break macros. So
+Peekaboo temporarily disables itself when replaying macros with `@`. However,
+if you invoke `@` via a non-recursive map (e.g. `nnoremap Q @q`), Peekaboo
+doesn't get a chance to do so and your macros may not work as expected. The
+workaround is to use recursive maps: `nmap Q @q`.
 
 License
 -------
