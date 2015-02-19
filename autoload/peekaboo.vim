@@ -75,7 +75,7 @@ function! s:init(mode)
 
   let s:regs = {}
   call s:append_group('Special', ['"', '*', '+', '-'])
-  call s:append_group('Read-only', a:mode ==# 'replay' ? ['.'] : ['.', '%', '#', '/'])
+  call s:append_group('Read-only', a:mode ==# 'replay' ? ['.'] : ['.', '%', '#', '/', ':'])
   call s:append_group('Numbered', range(0, 9))
   call s:append_group('Named', map(range(97, 97 + 25), 'nr2char(v:val)'))
   normal! "_dd
