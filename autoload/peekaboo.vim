@@ -194,6 +194,7 @@ xnoremap <Plug>(pkbq2) ""
 nnoremap <Plug>(pkbr1) @
 nnoremap <Plug>(pkbr2) @@
 inoremap <Plug>(pkbcr) <c-r>
+cnoremap <Plug>(pkbcr) <c-r>
 nnoremap <silent> <Plug>(pkbon) :call peekaboo#on()<cr>
 inoremap <silent> <Plug>(pkbon) <c-o>:call peekaboo#on()<cr>
 vnoremap <silent> <Plug>(pkbon) :<c-u>call peekaboo#on()<cr>gv
