@@ -46,6 +46,11 @@ that they are not expanded. It is strongly advised that [you always stick to
 
 [m]: http://learnvimscriptthehardway.stevelosh.com/chapters/05.html
 
+### "Can I use Peekaboo in command-line mode?"
+
+There's no native support for command-line mode, but it's possible with another
+plugin. See [here](https://github.com/junegunn/vim-peekaboo/issues/23#issuecomment-84500667).
+
 Known issues
 ------------
 
