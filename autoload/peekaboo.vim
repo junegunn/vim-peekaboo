@@ -26,7 +26,8 @@ set cpo&vim
 let s:peekaboo = 0
 
 function! s:append_group(title, regs)
-  call append(line('$'), a:title.':')
+  let compact = get(g:, 'peekaboo_compact', 0)
+  if !compact | call append(line('$'), a:title.':') | endif
   for r in a:regs
     try
       if r == '%'     | let val = s:cur
@@ -41,7 +42,7 @@ function! s:append_group(title, regs)
     catch
     endtry
   endfor
-  call append(line('$'), '')
+  if !compact | call append(line('$'), '') | endif
 endfunction
 
 function! s:close()
