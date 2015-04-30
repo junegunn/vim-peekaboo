@@ -21,19 +21,27 @@
 " THE SOFTWARE.
 
 function! peekaboo#on()
-  nnoremap <silent> " :<c-u>call peekaboo#peek(v:count1, 'quote',  0)<cr>
-  xnoremap <silent> " :<c-u>call peekaboo#peek(v:count1, 'quote',  1)<cr>
-  nnoremap <silent> @ :<c-u>call peekaboo#peek(v:count1, 'replay', 0)<cr>
-  inoremap <silent> <c-r> <c-o>:call peekaboo#peek(1, 'ctrl-r',  0)<cr>
+  if get(b:, 'peekaboo_on', 0)
+    return
+  endif
+  nnoremap <buffer> <silent> " :<c-u>call peekaboo#peek(v:count1, 'quote',  0)<cr>
+  xnoremap <buffer> <silent> " :<c-u>call peekaboo#peek(v:count1, 'quote',  1)<cr>
+  nnoremap <buffer> <silent> @ :<c-u>call peekaboo#peek(v:count1, 'replay', 0)<cr>
+  inoremap <buffer> <silent> <c-r> <c-o>:call peekaboo#peek(1, 'ctrl-r',  0)<cr>
+  let b:peekaboo_on = 1
   return ''
 endfunction
 
 function! peekaboo#off()
-  nunmap "
-  xunmap "
-  nunmap @
-  iunmap <c-r>
+  nunmap <buffer> "
+  xunmap <buffer> "
+  nunmap <buffer> @
+  iunmap <buffer> <c-r>
+  let b:peekaboo_on = 0
 endfunction
 
-call peekaboo#on()
+augroup peekaboo_init
+  autocmd!
+  autocmd BufEnter * if empty(getcmdwintype()) | call peekaboo#on() | endif
+augroup END
 
