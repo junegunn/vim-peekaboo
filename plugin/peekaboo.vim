@@ -42,6 +42,6 @@ endfunction
 
 augroup peekaboo_init
   autocmd!
-  autocmd BufEnter * if empty(getcmdwintype()) | call peekaboo#on() | endif
+  autocmd BufEnter * if !exists('*getcmdwintype') || empty(getcmdwintype()) | call peekaboo#on() | endif
 augroup END
 
