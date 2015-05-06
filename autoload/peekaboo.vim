@@ -24,6 +24,7 @@ let s:cpo_save = &cpo
 set cpo&vim
 
 let s:peekaboo = 0
+let s:disable_duration = 200
 
 function! s:append_group(title, regs)
   let compact = get(g:, 'peekaboo_compact', 0)
@@ -51,14 +52,40 @@ function! s:close()
   endif
 endfunction
 
+function! s:diff_ms(since)
+  let [sec, usec] = map(split(reltimestr(reltime(a:since)), '[^0-9]'), 'str2nr(v:val)')
+  let usec = sec * 1000000 + usec
+  return usec / 1000
+endfunction
+
+function! s:gets_nodelay()
+  let s = ''
+  while 1
+    let c = getchar(0)
+    if !c
+      break
+    endif
+    let s .= nr2char(c)
+  endwhile
+  return s
+endfunction
+
 function! s:init(mode)
   call s:close()
+  if exists('s:disabled')
+    if s:diff_ms(s:disabled) < s:disable_duration
+      let s:disabled = reltime()
+      return [0, s:gets_nodelay()]
+    endif
+    unlet s:disabled
+  endif
+
   let delay = get(g:, 'peekaboo_delay', 0)
   while delay > 0
     let delay -= 50
     let c = getchar(0)
     if c
-      return nr2char(c)
+      return [0, nr2char(c)]
     endif
     sleep 50m
   endwhile
@@ -84,7 +111,7 @@ function! s:init(mode)
   call s:append_group('Numbered', map(range(0, 9), 'string(v:val)'))
   call s:append_group('Named', map(range(97, 97 + 25), 'nr2char(v:val)'))
   normal! "_dd
-  return ''
+  return [1, '']
 endfunction
 
 function! s:back(visualmode)
@@ -106,11 +133,10 @@ function! s:feed(count, mode, reg, rest)
     else                 | let seq .= "\<Plug>(pkbcr)" . a:reg
     endif
   else
-    call peekaboo#off()
+    let s:disabled = reltime()
     if a:reg == '@' | let seq .= "\<Plug>(pkbr2)" . a:rest
     else            | let seq .= "\<Plug>(pkbr1)" . a:reg . a:rest
     endif
-    let seq .= "\<Plug>(pkbon)"
   endif
   call feedkeys(seq)
 endfunction
@@ -125,13 +151,13 @@ let s:scroll = {
 
 function! peekaboo#peek(count, mode, visualmode)
   let s:win = { 'current': winnr() }
-  let c = s:init(a:mode)
+  let [ok, str] = s:init(a:mode)
   let s:win.peekaboo = winnr()
-  if !empty(c)
+  if !ok
     if a:visualmode
       normal! gv
     endif
-    return s:feed(a:count, a:mode, c, '')
+    return s:feed(a:count, a:mode, str, '')
   endif
   call s:back(a:visualmode)
 
@@ -196,10 +222,6 @@ nnoremap <Plug>(pkbr1) @
 nnoremap <Plug>(pkbr2) @@
 inoremap <Plug>(pkbcr) <c-r>
 cnoremap <Plug>(pkbcr) <c-r>
-nnoremap <silent> <Plug>(pkbon) :call peekaboo#on()<cr>
-inoremap <silent> <Plug>(pkbon) <c-o>:call peekaboo#on()<cr>
-vnoremap <silent> <Plug>(pkbon) :<c-u>call peekaboo#on()<cr>gv
-cnoremap <silent> <Plug>(pkbon) <c-r>=peekaboo#on()<cr>
 
 let &cpo = s:cpo_save
 unlet s:cpo_save
