@@ -129,13 +129,13 @@ function! s:feed(count, mode, reg, rest)
     else            | let seq .= "\<Plug>(pkbq1)" . a:reg . a:rest
     endif
   elseif a:mode ==# 'ctrl-r'
-    if a:reg == "\<c-r>" | let seq .= a:reg
-    else                 | let seq .= "\<Plug>(pkbcr)" . a:reg
+    if a:reg == "\<c-r>" | let seq .= "\<Plug>(pkbcr2)"
+    else                 | let seq .= "\<Plug>(pkbcr1)" . a:reg
     endif
   else
     let s:disabled = reltime()
-    if a:reg == '@' | let seq .= "\<Plug>(pkbr2)" . a:rest
-    else            | let seq .= "\<Plug>(pkbr1)" . a:reg . a:rest
+    if a:reg == '@' | let seq .= "\<Plug>(pkbr2)"
+    else            | let seq .= "\<Plug>(pkbr1)" . a:reg
     endif
   endif
   call feedkeys(seq)
@@ -220,8 +220,10 @@ xnoremap <Plug>(pkbq1) "
 xnoremap <Plug>(pkbq2) ""
 nnoremap <Plug>(pkbr1) @
 nnoremap <Plug>(pkbr2) @@
-inoremap <Plug>(pkbcr) <c-r>
-cnoremap <Plug>(pkbcr) <c-r>
+inoremap <Plug>(pkbcr1) <c-r>
+inoremap <Plug>(pkbcr2) <c-r><c-r>
+cnoremap <Plug>(pkbcr1) <c-r>
+cnoremap <Plug>(pkbcr2) <c-r><c-r>
 
 let &cpo = s:cpo_save
 unlet s:cpo_save
