@@ -115,7 +115,7 @@ function! s:init(mode)
 endfunction
 
 function! s:back(visualmode)
-  execute s:win.current.'wincmd w'
+  noautocmd execute s:win.current.'wincmd w'
   if a:visualmode
     normal! gv
   endif
