@@ -114,10 +114,23 @@ function! s:init(mode)
   return [1, '']
 endfunction
 
+function! s:visible(pos)
+  return a:pos.tab == tabpagenr() && bufwinnr(a:pos.buf) != -1 && !s:inplace
+endfunction
+
+function! s:move(pos)
+  if a:pos.tab != tabpagenr()
+    noautocmd execute 'normal!' (a:pos.tab).'gt'
+  endif
+  noautocmd execute bufwinnr(a:pos.buf).'wincmd w'
+endfunction
+
 function! s:back(visualmode)
-  noautocmd execute s:win.current.'wincmd w'
-  if a:visualmode
-    normal! gv
+  if s:visible(s:win.current)
+    call s:move(s:win.current)
+    if a:visualmode
+      normal! gv
+    endif
   endif
   redraw
 endfunction
@@ -149,10 +162,17 @@ let s:scroll = {
 \ "\<pageup>": "\<c-b>", "\<pagedown>": "\<c-f>"
 \ }
 
+function! s:getpos()
+  return {'tab': tabpagenr(), 'buf': bufnr(''), 'win': winnr(), 'cnt': winnr('$')}
+endfunction
+
 function! peekaboo#peek(count, mode, visualmode)
-  let s:win = { 'current': winnr() }
+  let s:win = { 'current': s:getpos() }
   let [ok, str] = s:init(a:mode)
-  let s:win.peekaboo = winnr()
+  let s:win.peekaboo = s:getpos()
+  let s:inplace = s:win.current.tab == s:win.peekaboo.tab &&
+                \ s:win.current.win == s:win.peekaboo.win &&
+                \ s:win.current.cnt == s:win.peekaboo.cnt
   if !ok
     if a:visualmode
       normal! gv
@@ -169,7 +189,7 @@ function! peekaboo#peek(count, mode, visualmode)
       let reg = nr2char(ch)
       let key = get(s:scroll, ch, get(s:scroll, reg, ''))
       if !empty(key)
-        execute s:win.peekaboo.'wincmd w'
+        call s:move(s:win.peekaboo)
         execute 'normal!' key
         call s:back(a:visualmode)
         continue
@@ -184,7 +204,7 @@ function! peekaboo#peek(count, mode, visualmode)
         break
       endif
       if !zoom
-        execute s:win.peekaboo.'wincmd w'
+        call s:move(s:win.peekaboo)
         tab split
         set showtabline=0 laststatus=0
       endif
@@ -194,7 +214,7 @@ function! peekaboo#peek(count, mode, visualmode)
 
     let rest = ''
     if a:mode ==# 'quote' && has_key(s:regs, tolower(reg))
-      execute s:win.peekaboo.'wincmd w'
+      call s:move(s:win.peekaboo)
       let line = s:regs[tolower(reg)]
       execute 'normal!' line.'G'
       execute 'syntax region peekabooSelected start=/\%'.line.'l\%5c/ end=/$/'
@@ -204,6 +224,17 @@ function! peekaboo#peek(count, mode, visualmode)
       let rest = nr2char(getchar())
     endif
 
+    " - Make sure that we're back to the original tab/window/buffer
+    "   - e.g. g:peekaboo_window = 'tabnew' / 'enew'
+    if s:inplace
+      noautocmd execute s:win.peekaboo.win.'wincmd w'
+      noautocmd execute 'buf' s:win.current.buf
+    else
+      call s:move(s:win.current)
+    endif
+    if a:visualmode
+      normal! gv
+    endif
     call s:feed(a:count, a:mode, reg, rest)
   catch /^Vim:Interrupt$/
     return
