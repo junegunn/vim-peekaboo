@@ -136,22 +136,16 @@ function! s:back(visualmode)
 endfunction
 
 function! s:feed(count, mode, reg, rest)
-  let seq = a:count > 1 ? a:count : ''
+  call feedkeys(a:count > 1 ? a:count : '', 'n')
   if a:mode ==# 'quote'
-    if a:reg == '"' | let seq .= "\<Plug>(pkbq2)" . a:rest
-    else            | let seq .= "\<Plug>(pkbq1)" . a:reg . a:rest
-    endif
+    call feedkeys('"'.a:reg, 'n')
+    call feedkeys(a:rest)
   elseif a:mode ==# 'ctrl-r'
-    if a:reg == "\<c-r>" | let seq .= "\<Plug>(pkbcr2)"
-    else                 | let seq .= "\<Plug>(pkbcr1)" . a:reg
-    endif
+    call feedkeys("\<c-r>".a:reg, 'n')
   else
     let s:disabled = reltime()
-    if a:reg == '@' | let seq .= "\<Plug>(pkbr2)"
-    else            | let seq .= "\<Plug>(pkbr1)" . a:reg
-    endif
+    call feedkeys('@'.a:reg, 'n')
   endif
-  call feedkeys(seq)
 endfunction
 
 let s:scroll = {
@@ -245,17 +239,5 @@ function! peekaboo#peek(count, mode, visualmode)
   endtry
 endfunction
 
-nnoremap <Plug>(pkbq1) "
-nnoremap <Plug>(pkbq2) ""
-xnoremap <Plug>(pkbq1) "
-xnoremap <Plug>(pkbq2) ""
-nnoremap <Plug>(pkbr1) @
-nnoremap <Plug>(pkbr2) @@
-inoremap <Plug>(pkbcr1) <c-r>
-inoremap <Plug>(pkbcr2) <c-r><c-r>
-cnoremap <Plug>(pkbcr1) <c-r>
-cnoremap <Plug>(pkbcr2) <c-r><c-r>
-
 let &cpo = s:cpo_save
 unlet s:cpo_save
-
