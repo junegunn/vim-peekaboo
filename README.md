@@ -36,6 +36,12 @@ let g:peekaboo_delay = 750
 
 " Compact display; do not display the names of the register groups
 let g:peekaboo_compact = 1
+
+" Prefix for the peekaboo key mapping (default: '')
+let g:peekaboo_prefix = '<leader>'
+
+" Prefix for CTRL-R insert key mapping (default: '')
+let g:peekaboo_ins_prefix = '<c-x>'
 ```
 
 FAQ
