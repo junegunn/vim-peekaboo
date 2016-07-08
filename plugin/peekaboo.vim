@@ -24,19 +24,24 @@ function! peekaboo#on()
   if get(b:, 'peekaboo_on', 0)
     return
   endif
-  nnoremap <buffer> <silent> " :<c-u>call peekaboo#peek(v:count1, 'quote',  0)<cr>
-  xnoremap <buffer> <silent> " :<c-u>call peekaboo#peek(v:count1, 'quote',  1)<cr>
-  nnoremap <buffer> <silent> @ :<c-u>call peekaboo#peek(v:count1, 'replay', 0)<cr>
-  inoremap <buffer> <silent> <c-r> <c-o>:call peekaboo#peek(1, 'ctrl-r',  0)<cr>
+
+  let prefix = get(g:, 'peekaboo_prefix', '')
+  let ins_prefix = get(g:, 'peekaboo_ins_prefix', '')
+  execute 'nnoremap <buffer> <silent> '.prefix.'" :<c-u>call peekaboo#peek(v:count1, ''quote'',  0)<cr>'
+  execute 'xnoremap <buffer> <silent> '.prefix.'" :<c-u>call peekaboo#peek(v:count1, ''quote'',  1)<cr>'
+  execute 'nnoremap <buffer> <silent> '.prefix.'@ :<c-u>call peekaboo#peek(v:count1, ''replay'', 0)<cr>'
+  execute 'inoremap <buffer> <silent> '.ins_prefix.'<c-r> <c-o>:call peekaboo#peek(1, ''ctrl-r'',  0)<cr>'
   let b:peekaboo_on = 1
   return ''
 endfunction
 
 function! peekaboo#off()
-  nunmap <buffer> "
-  xunmap <buffer> "
-  nunmap <buffer> @
-  iunmap <buffer> <c-r>
+  let prefix = get(g:, 'peekaboo_prefix', '')
+  let ins_prefix = get(g:, 'peekaboo_ins_prefix', '')
+  execute 'nunmap <buffer> '.prefix.'"'
+  execute 'xunmap <buffer> '.prefix.'"'
+  execute 'nunmap <buffer> '.prefix.'@'
+  execute 'iunmap <buffer> '.ins_prefix.'<c-r>'
   let b:peekaboo_on = 0
 endfunction
 
