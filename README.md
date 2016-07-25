@@ -63,7 +63,7 @@ plugin. See [here](https://github.com/junegunn/vim-peekaboo/issues/23#issuecomme
 Known issues
 ------------
 
-### Compatability with macros
+### Compatibility with macros
 
 Peekaboo internally uses `feedkeys()` function which can break macros. So
 Peekaboo temporarily disables itself when replaying macros with `@`. However,
