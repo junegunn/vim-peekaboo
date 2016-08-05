@@ -49,6 +49,7 @@ endfunction
 function! s:close()
   if s:peekaboo
     silent! execute 'bd' s:peekaboo
+    let s:peekaboo = 0
   endif
 endfunction
 
@@ -118,21 +119,15 @@ function! s:visible(pos)
   return a:pos.tab == tabpagenr() && bufwinnr(a:pos.buf) != -1 && !s:inplace
 endfunction
 
-function! s:move(pos)
-  if a:pos.tab != tabpagenr()
-    noautocmd execute 'normal!' (a:pos.tab).'gt'
+function! s:gv(visualmode)
+  if a:visualmode && s:visible(s:win.current)
+    wincmd p
+    normal! gv
+    redraw
+    wincmd p
+  else
+    redraw
   endif
-  noautocmd execute bufwinnr(a:pos.buf).'wincmd w'
-endfunction
-
-function! s:back(visualmode)
-  if s:visible(s:win.current)
-    call s:move(s:win.current)
-    if a:visualmode
-      normal! gv
-    endif
-  endif
-  redraw
 endfunction
 
 function! s:feed(count, mode, reg, rest)
@@ -173,7 +168,7 @@ function! peekaboo#peek(count, mode, visualmode)
     endif
     return s:feed(a:count, a:mode, str, '')
   endif
-  call s:back(a:visualmode)
+  call s:gv(a:visualmode)
 
   let [stl, lst] = [&showtabline, &laststatus]
   let zoom = 0
@@ -183,22 +178,20 @@ function! peekaboo#peek(count, mode, visualmode)
       let reg = nr2char(ch)
       let key = get(s:scroll, ch, get(s:scroll, reg, ''))
       if !empty(key)
-        call s:move(s:win.peekaboo)
         execute 'normal!' key
-        call s:back(a:visualmode)
+        call s:gv(a:visualmode)
         continue
       endif
 
       if zoom
         tab close
         let [&showtabline, &laststatus] = [stl, lst]
-        call s:back(a:visualmode)
+        call s:gv(a:visualmode)
       endif
       if reg != ' '
         break
       endif
       if !zoom
-        call s:move(s:win.peekaboo)
         tab split
         set showtabline=0 laststatus=0
       endif
@@ -208,23 +201,24 @@ function! peekaboo#peek(count, mode, visualmode)
 
     let rest = ''
     if a:mode ==# 'quote' && has_key(s:regs, tolower(reg))
-      call s:move(s:win.peekaboo)
       let line = s:regs[tolower(reg)]
-      execute 'normal!' line.'G'
+      execute line
       execute 'syntax region peekabooSelected start=/\%'.line.'l\%5c/ end=/$/'
       setlocal cursorline
       call setline(line('.'), substitute(getline('.'), ' .', ' '.reg, ''))
-      call s:back(a:visualmode)
+      call s:gv(a:visualmode)
       let rest = nr2char(getchar())
     endif
 
     " - Make sure that we're back to the original tab/window/buffer
     "   - e.g. g:peekaboo_window = 'tabnew' / 'enew'
     if s:inplace
-      noautocmd execute s:win.peekaboo.win.'wincmd w'
+      noautocmd execute s:win.current.win.'wincmd w'
       noautocmd execute 'buf' s:win.current.buf
     else
-      call s:move(s:win.current)
+      noautocmd execute 'tabnext' s:win.current.tab
+      call s:close()
+      noautocmd execute s:win.current.win.'wincmd w'
     endif
     if a:visualmode
       normal! gv
