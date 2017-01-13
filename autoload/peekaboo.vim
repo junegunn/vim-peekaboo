@@ -1,6 +1,6 @@
 " The MIT License (MIT)
 "
-" Copyright (c) 2015 Junegunn Choi
+" Copyright (c) 2017 Junegunn Choi
 "
 " Permission is hereby granted, free of charge, to any person obtaining a copy
 " of this software and associated documentation files (the "Software"), to deal
@@ -50,6 +50,7 @@ function! s:close()
   if s:peekaboo
     silent! execute 'bd' s:peekaboo
     let s:peekaboo = 0
+    execute s:winrestcmd
   endif
 endfunction
 
@@ -91,7 +92,7 @@ function! s:init(mode)
     sleep 50m
   endwhile
 
-  let [s:cur, s:alt] = [@%, @#]
+  let [s:cur, s:alt, s:winrestcmd] = [@%, @#, winrestcmd()]
   execute get(g:, 'peekaboo_window', 'vertical botright 30new')
   let s:peekaboo = bufnr('')
   setlocal nonumber buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap
