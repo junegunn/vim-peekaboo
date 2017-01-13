@@ -1,6 +1,6 @@
 " The MIT License (MIT)
 "
-" Copyright (c) 2015 Junegunn Choi
+" Copyright (c) 2017 Junegunn Choi
 "
 " Permission is hereby granted, free of charge, to any person obtaining a copy
 " of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@ function! peekaboo#on()
   execute 'nnoremap <buffer> <silent> '.prefix.'" :<c-u>call peekaboo#peek(v:count1, ''quote'',  0)<cr>'
   execute 'xnoremap <buffer> <silent> '.prefix.'" :<c-u>call peekaboo#peek(v:count1, ''quote'',  1)<cr>'
   execute 'nnoremap <buffer> <silent> '.prefix.'@ :<c-u>call peekaboo#peek(v:count1, ''replay'', 0)<cr>'
-  execute 'inoremap <buffer> <silent> '.ins_prefix.'<c-r> <c-o>:call peekaboo#peek(1, ''ctrl-r'',  0)<cr>'
+  execute 'inoremap <buffer> <silent> '.ins_prefix.'<c-r> <c-\><c-o>:call peekaboo#peek(1, ''ctrl-r'',  0)<cr>'
   let b:peekaboo_on = 1
   return ''
 endfunction
