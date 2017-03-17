@@ -23,16 +23,52 @@
 let s:cpo_save = &cpo
 set cpo&vim
 
-let s:peekaboo = 0
-let s:disable_duration = 200
+" Default options
+let s:default_delay = 0
+let s:default_window = 'vertical botright 30new'
+let s:default_compact = 0
 
+let s:QUOTE  = '"'
+let s:REPLAY = '@'
+let s:CTRL_R = "\<c-r>"
+
+let s:buf_peekaboo = 0
+
+" Returns true if timed out
+function! s:wait_with_timeout(timeout)
+  let timeout = a:timeout
+  while timeout >= 0
+    if getchar(1)
+      return 0
+    endif
+    if timeout > 0
+      sleep 20m
+    endif
+    let timeout -= 20
+  endwhile
+  return 1
+endfunction
+
+" Checks if Peekaboo buffer is open
+function! s:is_open()
+  return s:buf_peekaboo
+endfunction
+
+" Closes peekaboo buffer
+function! s:close()
+  silent! execute 'bd' s:buf_peekaboo
+  let s:buf_peekaboo = 0
+  execute s:winrestcmd
+endfunction
+
+" Appends macro list for the specified group to Peekaboo window
 function! s:append_group(title, regs)
-  let compact = get(g:, 'peekaboo_compact', 0)
+  let compact = get(g:, 'peekaboo_compact', s:default_compact)
   if !compact | call append(line('$'), a:title.':') | endif
   for r in a:regs
     try
-      if r == '%'     | let val = s:cur
-      elseif r == '#' | let val = s:alt
+      if r == '%'     | let val = s:buf_current
+      elseif r == '#' | let val = s:buf_alternate
       else            | let val = eval('@'.r)
       endif
       if empty(val)
@@ -46,55 +82,11 @@ function! s:append_group(title, regs)
   if !compact | call append(line('$'), '') | endif
 endfunction
 
-function! s:close()
-  if s:peekaboo
-    silent! execute 'bd' s:peekaboo
-    let s:peekaboo = 0
-    execute s:winrestcmd
-  endif
-endfunction
-
-function! s:diff_ms(since)
-  let [sec, usec] = map(split(reltimestr(reltime(a:since)), '[^0-9]'), 'str2nr(v:val)')
-  let usec = sec * 1000000 + usec
-  return usec / 1000
-endfunction
-
-function! s:gets_nodelay()
-  let s = ''
-  while 1
-    let c = getchar(0)
-    if !c
-      break
-    endif
-    let s .= nr2char(c)
-  endwhile
-  return s
-endfunction
-
-function! s:init(mode)
-  call s:close()
-  if exists('s:disabled')
-    if s:diff_ms(s:disabled) < s:disable_duration
-      let s:disabled = reltime()
-      return [0, s:gets_nodelay()]
-    endif
-    unlet s:disabled
-  endif
-
-  let delay = get(g:, 'peekaboo_delay', 0)
-  while delay > 0
-    let delay -= 50
-    let c = getchar(0)
-    if c
-      return [0, nr2char(c)]
-    endif
-    sleep 50m
-  endwhile
-
-  let [s:cur, s:alt, s:winrestcmd] = [@%, @#, winrestcmd()]
-  execute get(g:, 'peekaboo_window', 'vertical botright 30new')
-  let s:peekaboo = bufnr('')
+" Opens peekaboo window
+function! s:open(mode)
+  let [s:buf_current, s:buf_alternate, s:winrestcmd] = [@%, @#, winrestcmd()]
+  execute get(g:, 'peekaboo_window', s:default_window)
+  let s:buf_peekaboo = bufnr('')
   setlocal nonumber buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap
   \ modifiable statusline=>\ Registers nocursorline nofoldenable
   if exists('&relativenumber')
@@ -109,19 +101,20 @@ function! s:init(mode)
 
   let s:regs = {}
   call s:append_group('Special', ['"', '*', '+', '-'])
-  call s:append_group('Read-only', a:mode ==# 'replay' ? ['.', ':'] : ['.', '%', '#', '/', ':'])
+  call s:append_group('Read-only', a:mode ==# s:REPLAY ? ['.', ':'] : ['.', '%', '#', '/', ':'])
   call s:append_group('Numbered', map(range(0, 9), 'string(v:val)'))
   call s:append_group('Named', map(range(97, 97 + 25), 'nr2char(v:val)'))
   normal! "_dd
-  return [1, '']
 endfunction
 
-function! s:visible(pos)
-  return a:pos.tab == tabpagenr() && bufwinnr(a:pos.buf) != -1 && !s:inplace
+" Checks if the buffer for the position is visible on screen
+function! s:is_visible(pos)
+  return a:pos.tab == tabpagenr() && bufwinnr(a:pos.buf) != -1
 endfunction
 
-function! s:gv(visualmode)
-  if a:visualmode && s:visible(s:win.current)
+" Triggers gv to keep visual highlight on
+function! s:gv(visualmode, visible)
+  if a:visualmode && a:visible
     wincmd p
     normal! gv
     redraw
@@ -131,15 +124,15 @@ function! s:gv(visualmode)
   endif
 endfunction
 
+" Feeds the final key sequence
 function! s:feed(count, mode, reg, rest)
   call feedkeys(a:count > 1 ? a:count : '', 'n')
-  if a:mode ==# 'quote'
+  if a:mode ==# s:QUOTE
     call feedkeys('"'.a:reg, 'n')
     call feedkeys(a:rest)
-  elseif a:mode ==# 'ctrl-r'
+  elseif a:mode ==# s:CTRL_R
     call feedkeys("\<c-r>".a:reg, 'n')
   else
-    let s:disabled = reltime()
     call feedkeys('@'.a:reg, 'n')
   endif
 endfunction
@@ -152,24 +145,39 @@ let s:scroll = {
 \ "\<pageup>": "\<c-b>", "\<pagedown>": "\<c-f>"
 \ }
 
+" Returns the position of the current buffer as a dictionary
 function! s:getpos()
   return {'tab': tabpagenr(), 'buf': bufnr(''), 'win': winnr(), 'cnt': winnr('$')}
 endfunction
 
 function! peekaboo#peek(count, mode, visualmode)
-  let s:win = { 'current': s:getpos() }
-  let [ok, str] = s:init(a:mode)
-  let s:win.peekaboo = s:getpos()
-  let s:inplace = s:win.current.tab == s:win.peekaboo.tab &&
-                \ s:win.current.win == s:win.peekaboo.win &&
-                \ s:win.current.cnt == s:win.peekaboo.cnt
-  if !ok
-    if a:visualmode
-      normal! gv
-    endif
-    return s:feed(a:count, a:mode, str, '')
+  " First check if we should start peekaboo, if not just return the mode key
+  let timeout = get(g:, 'peekaboo_delay', s:default_delay)
+  if !s:wait_with_timeout(timeout)
+    return a:mode
   endif
-  call s:gv(a:visualmode)
+
+  let s:args = [a:count, a:mode, a:visualmode]
+  return "\<Plug>(peekaboo)"
+endfunction
+
+function! peekaboo#aboo()
+  let [cnt, mode, visualmode] = s:args
+
+  if s:is_open()
+    call s:close()
+  endif
+
+  let positions = { 'current': s:getpos() }
+  call s:open(mode)
+  let positions.peekaboo = s:getpos()
+
+  let inplace = positions.current.tab == positions.peekaboo.tab &&
+        \ positions.current.win == positions.peekaboo.win &&
+        \ positions.current.cnt == positions.peekaboo.cnt
+  let visible = !inplace && s:is_visible(positions.current)
+
+  call s:gv(visualmode, visible)
 
   let [stl, lst] = [&showtabline, &laststatus]
   let zoom = 0
@@ -180,14 +188,14 @@ function! peekaboo#peek(count, mode, visualmode)
       let key = get(s:scroll, ch, get(s:scroll, reg, ''))
       if !empty(key)
         execute 'normal!' key
-        call s:gv(a:visualmode)
+        call s:gv(visualmode, visible)
         continue
       endif
 
       if zoom
         tab close
         let [&showtabline, &laststatus] = [stl, lst]
-        call s:gv(a:visualmode)
+        call s:gv(visualmode, visible)
       endif
       if reg != ' '
         break
@@ -201,30 +209,30 @@ function! peekaboo#peek(count, mode, visualmode)
     endwhile
 
     let rest = ''
-    if a:mode ==# 'quote' && has_key(s:regs, tolower(reg))
+    if mode ==# s:QUOTE && has_key(s:regs, tolower(reg))
       let line = s:regs[tolower(reg)]
       execute line
       execute 'syntax region peekabooSelected start=/\%'.line.'l\%5c/ end=/$/'
       setlocal cursorline
       call setline(line('.'), substitute(getline('.'), ' .', ' '.reg, ''))
-      call s:gv(a:visualmode)
+      call s:gv(visualmode, visible)
       let rest = nr2char(getchar())
     endif
 
     " - Make sure that we're back to the original tab/window/buffer
     "   - e.g. g:peekaboo_window = 'tabnew' / 'enew'
-    if s:inplace
-      noautocmd execute s:win.current.win.'wincmd w'
-      noautocmd execute 'buf' s:win.current.buf
+    if inplace
+      noautocmd execute positions.current.win.'wincmd w'
+      noautocmd execute 'buf' positions.current.buf
     else
-      noautocmd execute 'tabnext' s:win.current.tab
+      noautocmd execute 'tabnext' positions.current.tab
       call s:close()
-      noautocmd execute s:win.current.win.'wincmd w'
+      noautocmd execute positions.current.win.'wincmd w'
     endif
-    if a:visualmode
+    if visualmode
       normal! gv
     endif
-    call s:feed(a:count, a:mode, reg, rest)
+    call s:feed(cnt, mode, reg, rest)
   catch /^Vim:Interrupt$/
     return
   finally
