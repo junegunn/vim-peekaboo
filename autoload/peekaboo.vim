@@ -69,7 +69,7 @@ function! s:append_group(title, regs)
     try
       if r == '%'     | let val = s:buf_current
       elseif r == '#' | let val = s:buf_alternate
-      else            | let val = eval('@'.r)
+      else            | let val = eval('@'.r)[:&columns]
       endif
       if empty(val)
         continue
