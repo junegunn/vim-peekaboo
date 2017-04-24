@@ -35,6 +35,18 @@ Customization
 | `g:peekaboo_prefix`     | Empty (string)  | Prefix for key mapping (e.g. `<leader>`)          |
 | `g:peekaboo_ins_prefix` | Empty (string)  | Prefix for insert mode key mapping (e.g. `<c-x>`) |
 
+Other possible values are:
+* `[vertical] leftabove [N]new`
+* `[vertical] rightbelow [N]new`
+* `[vertical] topleft [N]new`
+* `[vertical] botright [N]new`
+
+Note: when vertical is ommitted, the window is split horizontally.
+
+See also: 
+* `:help new` ([vimdoc](http://vimdoc.sourceforge.net/htmldoc/windows.html#:new))
+* `:help vertical` and everything below ([vimdoc](http://vimdoc.sourceforge.net/htmldoc/windows.html#:vertical))
+
 License
 -------
 
