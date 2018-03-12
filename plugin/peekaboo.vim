@@ -23,6 +23,9 @@
 nnoremap <silent> <Plug>(peekaboo) :<c-u>call peekaboo#aboo()<cr>
 xnoremap <silent> <Plug>(peekaboo) :<c-u>call peekaboo#aboo()<cr>
 inoremap <silent> <Plug>(peekaboo) <c-\><c-o>:<c-u>call peekaboo#aboo()<cr>
+if exists(':tnoremap')
+   tnoremap <silent> <Plug>(peekaboo) <c-w>:call peekaboo#aboo()<cr>
+endif
 
 function! peekaboo#on()
   if get(b:, 'peekaboo_on', 0)
@@ -31,10 +34,13 @@ function! peekaboo#on()
 
   let prefix = get(g:, 'peekaboo_prefix', '')
   let ins_prefix = get(g:, 'peekaboo_ins_prefix', '')
-  execute 'nmap <buffer> <expr> '.prefix.    '"     peekaboo#peek(v:count1, ''"'',  0)'
-  execute 'xmap <buffer> <expr> '.prefix.    '"     peekaboo#peek(v:count1, ''"'',  1)'
-  execute 'nmap <buffer> <expr> '.prefix.    '@     peekaboo#peek(v:count1, ''@'', 0)'
-  execute 'imap <buffer> <expr> '.ins_prefix.'<c-r> peekaboo#peek(1, "\<c-r>",  0)'
+  execute 'nmap <buffer> <expr> '.prefix.    '"      peekaboo#peek(v:count1, ''"'',  0)'
+  execute 'xmap <buffer> <expr> '.prefix.    '"      peekaboo#peek(v:count1, ''"'',  1)'
+  execute 'nmap <buffer> <expr> '.prefix.    '@      peekaboo#peek(v:count1, ''@'', 0)'
+  execute 'imap <buffer> <expr> '.ins_prefix.'<c-r>  peekaboo#peek(1, "\<c-r>",  0)'
+   if exists(':tmap')
+     execute 'tmap <buffer> <expr> '.prefix.    '<c-w>" peekaboo#peek(1, "\<c-w>\"",  1)'
+   endif
   let b:peekaboo_on = 1
   return ''
 endfunction

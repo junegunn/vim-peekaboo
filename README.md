@@ -3,8 +3,8 @@ vim-peekaboo
 
 ![](https://cloud.githubusercontent.com/assets/700826/6095261/bb00340c-af96-11e4-9df5-9cd869673a11.gif)
 
-Peekaboo extends `"` and `@` in normal mode and `<CTRL-R>` in insert mode so
-you can see the contents of the registers.
+Peekaboo extends `"` and `@` in normal mode, `<CTRL-R>` in insert mode and
+`<CTRL-W>"` in Terminal-Job mode so you can see the contents of the registers.
 
 Installation
 ------------
@@ -19,8 +19,9 @@ Usage
 -----
 
 Peekaboo will show you the contents of the registers on the sidebar when you
-hit `"` or `@` in normal mode or `<CTRL-R>` in insert mode. The sidebar is
-automatically closed on subsequent key strokes.
+hit `"` or `@` in normal mode, `<CTRL-R>` in insert mode or `<CTRL-W>"` in
+Terminal-Job mode. The sidebar is automatically closed on subsequent key
+strokes.
 
 You can toggle fullscreen mode by pressing spacebar.
 
