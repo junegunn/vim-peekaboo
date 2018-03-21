@@ -58,6 +58,7 @@ endfunction
 function! s:close()
   silent! execute 'bd' s:buf_peekaboo
   let s:buf_peekaboo = 0
+  let &l:startofline = s:sol
   execute s:winrestcmd
 endfunction
 
@@ -85,6 +86,8 @@ endfunction
 " Opens peekaboo window
 function! s:open(mode)
   let [s:buf_current, s:buf_alternate, s:winrestcmd] = [@%, @#, winrestcmd()]
+  let s:sol=&l:startofline
+  setlocal nostartofline
   execute get(g:, 'peekaboo_window', s:default_window)
   let s:buf_peekaboo = bufnr('')
   setlocal nonumber buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap
