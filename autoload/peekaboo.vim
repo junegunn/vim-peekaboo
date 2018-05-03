@@ -194,6 +194,7 @@ function! peekaboo#aboo()
 
       if zoom
         tab close
+        noautocmd execute 'tabnext' positions.current.tab
         let [&showtabline, &laststatus] = [stl, lst]
         call s:gv(visualmode, visible)
       endif
