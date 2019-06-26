@@ -20,9 +20,9 @@
 " OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 " THE SOFTWARE.
 
-nnoremap <silent> <Plug>(peekaboo) :<c-u>call peekaboo#aboo()<cr>
-xnoremap <silent> <Plug>(peekaboo) :<c-u>call peekaboo#aboo()<cr>
-inoremap <silent> <Plug>(peekaboo) <c-\><c-o>:<c-u>call peekaboo#aboo()<cr>
+nnoremap <silent> <Plug>(peekaboo) :<c-u>call peekaboo#aboo(0)<cr>
+xnoremap <silent> <Plug>(peekaboo) :<c-u>call peekaboo#aboo(0)<cr>
+inoremap <silent> <Plug>(peekaboo) <c-r>=peekaboo#aboo(1)<cr>
 
 function! peekaboo#on()
   if get(b:, 'peekaboo_on', 0)
