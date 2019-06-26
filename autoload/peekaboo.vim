@@ -181,7 +181,7 @@ function! peekaboo#aboo(insert_mode)
 
   call s:gv(visualmode, visible)
 
-  let [stl, lst] = [&showtabline, &laststatus]
+  let [s:stl, s:lst] = [&showtabline, &laststatus]
   let zoom = 0
   try
     while 1
@@ -196,7 +196,7 @@ function! peekaboo#aboo(insert_mode)
 
       if zoom
         tab close
-        let [&showtabline, &laststatus] = [stl, lst]
+        let [&showtabline, &laststatus] = [s:stl, s:lst]
         call s:gv(visualmode, visible)
       endif
       if reg != ' '
@@ -237,7 +237,7 @@ function! peekaboo#aboo(insert_mode)
     if a:insert_mode
       augroup peekaboo_hide
         au!
-        au TextChangedI * let [&showtabline, &laststatus] = [stl, lst] | call s:close() | redraw
+        au TextChangedI * let [&showtabline, &laststatus] = [s:stl, s:lst] | call s:close() | redraw
       augroup END
       return s:CTRL_R . reg
     else
@@ -246,7 +246,7 @@ function! peekaboo#aboo(insert_mode)
   catch /^Vim:Interrupt$/
     return a:insert_mode ? '' : 1
   finally
-    let [&showtabline, &laststatus] = [stl, lst]
+    let [&showtabline, &laststatus] = [s:stl, s:lst]
     call s:close()
     redraw
   endtry
