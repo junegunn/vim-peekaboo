@@ -244,7 +244,7 @@ function! peekaboo#aboo(insert_mode)
       call s:feed(cnt, mode, reg, rest)
     endif
   catch /^Vim:Interrupt$/
-    return
+    return a:insert_mode ? '' : 1
   finally
     let [&showtabline, &laststatus] = [stl, lst]
     call s:close()
