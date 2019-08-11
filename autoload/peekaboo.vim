@@ -75,7 +75,7 @@ function! s:append_group(title, regs)
         continue
       endif
       let s:regs[printf('%s', r)] = line('$')
-      call append(line('$'), printf(' %s: %s', r, val))
+      call append(line('$'), printf(' %s: %s', r, substitute(val, '^\s*', '', '')))
     catch
     endtry
   endfor
