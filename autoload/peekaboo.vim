@@ -115,10 +115,11 @@ endfunction
 " Triggers gv to keep visual highlight on
 function! s:gv(visualmode, visible)
   if a:visualmode && a:visible
+    let wnr = bufwinnr('')
     wincmd p
     normal! gv
     redraw
-    wincmd p
+    execute wnr 'wincmd w'
   else
     redraw
   endif
