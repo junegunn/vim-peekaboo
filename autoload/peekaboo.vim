@@ -115,10 +115,10 @@ endfunction
 " Triggers gv to keep visual highlight on
 function! s:gv(visualmode, visible)
   if a:visualmode && a:visible
-    wincmd p
+    noautocmd wincmd p
     normal! gv
     redraw
-    wincmd p
+    noautocmd wincmd p
   else
     redraw
   endif
