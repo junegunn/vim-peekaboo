@@ -58,6 +58,9 @@ endfunction
 function! s:close()
   silent! execute 'bd' s:buf_peekaboo
   let s:buf_peekaboo = 0
+  if s:alternate != ''
+    let @# = s:buf_alternate
+  endif
   execute s:winrestcmd
 endfunction
 
