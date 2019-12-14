@@ -31,6 +31,7 @@ let s:default_compact = 0
 let s:QUOTE  = '"'
 let s:REPLAY = '@'
 let s:CTRL_R = "\<c-r>"
+let s:TERM = "\<c-w>\""
 
 let s:buf_peekaboo = 0
 
@@ -132,6 +133,8 @@ function! s:feed(count, mode, reg, rest)
     call feedkeys(a:rest)
   elseif a:mode ==# s:CTRL_R
     call feedkeys("\<c-r>".a:reg, 'n')
+  elseif a:mode ==# s:TERM
+    call feedkeys("\<c-w>\"".a:reg, 'n')
   else
     call feedkeys('@'.a:reg, 'n')
   endif
