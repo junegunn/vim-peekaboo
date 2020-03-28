@@ -100,8 +100,8 @@ function! s:open(mode)
   augroup END
 
   let s:regs = {}
-  call s:append_group('Special', ['"', '*', '+', '-'])
-  call s:append_group('Read-only', a:mode ==# s:REPLAY ? ['.', ':'] : ['.', '%', '#', '/', ':'])
+  call s:append_group('Special', get(g:, 'peekaboo_special', ['"', '*', '+', '-']))
+  call s:append_group('Read-only', a:mode ==# s:REPLAY ? ['.', ':'] : get(g:, 'peekaboo_readonly', ['.', '%', '#', '/', ':']))
   call s:append_group('Numbered', map(range(0, 9), 'string(v:val)'))
   call s:append_group('Named', map(range(97, 97 + 25), 'nr2char(v:val)'))
   normal! "_dd
