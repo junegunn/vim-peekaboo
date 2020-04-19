@@ -24,7 +24,7 @@ nnoremap <silent> <Plug>(peekaboo) :<c-u>call peekaboo#aboo()<cr>
 xnoremap <silent> <Plug>(peekaboo) :<c-u>call peekaboo#aboo()<cr>
 inoremap <silent> <Plug>(peekaboo) <c-\><c-o>:<c-u>call peekaboo#aboo()<cr>
 
-function! peekaboo#on()
+function! Peekaboo_on()
   if get(b:, 'peekaboo_on', 0)
     return
   endif
@@ -39,7 +39,7 @@ function! peekaboo#on()
   return ''
 endfunction
 
-function! peekaboo#off()
+function! Peekaboo_off()
   if !get(b:, 'peekaboo_on', 0)
     return
   endif
@@ -55,6 +55,6 @@ endfunction
 
 augroup peekaboo_init
   autocmd!
-  autocmd BufEnter * if !exists('*getcmdwintype') || empty(getcmdwintype()) | call peekaboo#on() | endif
+  autocmd BufEnter * if !exists('*getcmdwintype') || empty(getcmdwintype()) | call Peekaboo_on() | endif
 augroup END
 
