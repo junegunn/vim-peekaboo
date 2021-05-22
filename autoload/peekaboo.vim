@@ -167,6 +167,9 @@ function! peekaboo#aboo()
   if s:is_open()
     call s:close()
   endif
+  
+  let g:foldcolumn_orig=&foldcolumn " at EO-func restore original
+  set foldcolumn=0  " so peekaboo vsplit has it too
 
   let positions = { 'current': s:getpos() }
   call s:open(mode)
@@ -239,6 +242,8 @@ function! peekaboo#aboo()
     let [&showtabline, &laststatus] = [stl, lst]
     call s:close()
     redraw
+    " restore with window foldcolumn
+    exec 'set foldcolumn='.g:foldcolumn_orig
   endtry
 endfunction
 
