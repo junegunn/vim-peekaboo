@@ -157,6 +157,10 @@ function! peekaboo#peek(count, mode, visualmode)
     return a:mode
   endif
 
+  if &runtimepath =~ 'lessspace.vim'
+    call lessspace#TemporaryDisableBegin()
+  endif
+
   let s:args = [a:count, a:mode, a:visualmode]
   return "\<Plug>(peekaboo)"
 endfunction
@@ -239,6 +243,9 @@ function! peekaboo#aboo()
     let [&showtabline, &laststatus] = [stl, lst]
     call s:close()
     redraw
+    if &runtimepath =~ 'lessspace.vim'
+      call lessspace#TemporaryDisableEnd()
+    endif
   endtry
 endfunction
 
