@@ -12,7 +12,7 @@ Installation
 Using [vim-plug](https://github.com/junegunn/vim-plug):
 
 ```vim
-Plug 'junegunn/vim-peekaboo'
+Plug 'Gee19/vim-peekaboo'
 ```
 
 Usage
@@ -36,6 +36,12 @@ Customization
 | `g:peekaboo_ins_prefix` | Empty (string)          | Prefix for insert mode key mapping (e.g. `<c-x>`) |
 | `g:peekaboo_special`    | '"', '*', '+', '-'      | Special registers to be listed                    |
 | `g:peekaboo_readonly`   | '.', '%', '#', '/', ':' | Read-only registers to be listed                  |
+
+Differences from HEAD
+-------
+- Fix conflict with repeat/dot command ([mg979](https://github.com/mg979))
+- Add vim help docs & optional special or read-only registers ([Konfekt](https://github.com/Konfekt))
+- Fix conflict with lesspace
 
 License
 -------
