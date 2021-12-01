@@ -59,6 +59,7 @@ function! s:close()
   silent! execute 'bd' s:buf_peekaboo
   let s:buf_peekaboo = 0
   execute s:winrestcmd
+  silent! autocmd! peekaboo_hide
 endfunction
 
 " Appends macro list for the specified group to Peekaboo window
@@ -165,7 +166,8 @@ function! peekaboo#peek(count, mode, visualmode)
   return "\<Plug>(peekaboo)"
 endfunction
 
-function! peekaboo#aboo()
+function! peekaboo#aboo(...)
+  let insert_mode = a:0
   let [cnt, mode, visualmode] = s:args
 
   if s:is_open()
@@ -183,7 +185,7 @@ function! peekaboo#aboo()
 
   call s:gv(visualmode, visible)
 
-  let [stl, lst] = [&showtabline, &laststatus]
+  let [s:stl, s:lst] = [&showtabline, &laststatus]
   let zoom = 0
   try
     while 1
@@ -198,7 +200,7 @@ function! peekaboo#aboo()
 
       if zoom
         tab close
-        let [&showtabline, &laststatus] = [stl, lst]
+        let [&showtabline, &laststatus] = [s:stl, s:lst]
         call s:gv(visualmode, visible)
       endif
       if reg != ' '
@@ -236,11 +238,19 @@ function! peekaboo#aboo()
     if visualmode
       normal! gv
     endif
-    call s:feed(cnt, mode, reg, rest)
+    if insert_mode
+      augroup peekaboo_hide
+        au!
+        au TextChangedI * let [&showtabline, &laststatus] = [s:stl, s:lst] | call s:close() | redraw
+      augroup END
+      return s:CTRL_R . reg
+    else
+      call s:feed(cnt, mode, reg, rest)
+    endif
   catch /^Vim:Interrupt$/
-    return
+    return insert_mode ? '' : 1
   finally
-    let [&showtabline, &laststatus] = [stl, lst]
+    let [&showtabline, &laststatus] = [s:stl, s:lst]
     call s:close()
     redraw
     if &runtimepath =~ 'lessspace.vim'
