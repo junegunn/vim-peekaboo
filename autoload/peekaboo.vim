@@ -58,7 +58,6 @@ endfunction
 function! s:close()
   silent! execute 'bd' s:buf_peekaboo
   let s:buf_peekaboo = 0
-  execute s:winrestcmd
 endfunction
 
 " Appends macro list for the specified group to Peekaboo window
@@ -84,7 +83,7 @@ endfunction
 
 " Opens peekaboo window
 function! s:open(mode)
-  let [s:buf_current, s:buf_alternate, s:winrestcmd] = [@%, @#, winrestcmd()]
+  let [s:buf_current, s:buf_alternate] = [@%, @#]
   execute get(g:, 'peekaboo_window', s:default_window)
   let s:buf_peekaboo = bufnr('')
   setlocal nonumber buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap
