@@ -63,8 +63,11 @@ endfunction
 
 " Appends macro list for the specified group to Peekaboo window
 function! s:append_group(title, regs)
+  if empty(a:regs)
+    return
+  endif
   let compact = get(g:, 'peekaboo_compact', s:default_compact)
-  if !compact && !empty(a:regs) | call append(line('$'), a:title.':') | endif
+  if !compact | call append(line('$'), a:title.':') | endif
   for r in a:regs
     try
       if r == '%'     | let val = s:buf_current
