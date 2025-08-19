@@ -63,6 +63,9 @@ endfunction
 
 " Appends macro list for the specified group to Peekaboo window
 function! s:append_group(title, regs)
+  if empty(a:regs)
+    return
+  endif
   let compact = get(g:, 'peekaboo_compact', s:default_compact)
   if !compact | call append(line('$'), a:title.':') | endif
   for r in a:regs
@@ -100,8 +103,8 @@ function! s:open(mode)
   augroup END
 
   let s:regs = {}
-  call s:append_group('Special', ['"', '*', '+', '-'])
-  call s:append_group('Read-only', a:mode ==# s:REPLAY ? ['.', ':'] : ['.', '%', '#', '/', ':'])
+  call s:append_group('Special', get(g:, 'peekaboo_special', ['"', '*', '+', '-']))
+  call s:append_group('Read-only', a:mode ==# s:REPLAY ? ['.', ':'] : get(g:, 'peekaboo_readonly', ['.', '%', '#', '/', ':']))
   call s:append_group('Numbered', map(range(0, 9), 'string(v:val)'))
   call s:append_group('Named', map(range(97, 97 + 25), 'nr2char(v:val)'))
   normal! "_dd
